@@ -3,8 +3,7 @@
 
 Ta repozitorij vsebuje projekt pri predmetu programiranje 2.
 
-Gre za programiranje igrice  [[https://en.wikipedia.org/wiki/Reversi|Reversi]].
-
+Gre za programiranje igrice Reversi (https://en.wikipedia.org/wiki/Reversi) .
 
 Predviden časovni razpored dela:
 
