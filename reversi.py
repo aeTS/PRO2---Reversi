@@ -1,5 +1,8 @@
 import tkinter
 
+from logika import *
+from clovek import *
+
 class Gui():
     
     TAG_FIGURA = 'figura'
@@ -18,9 +21,10 @@ class Gui():
         # Objekti, ki predstavljajo belega, črnega igralca in igro
         self.igralec_beli = None 
         self.igralec_crni = None
-        self.igra = None 
+        self.igra = None
+        self.id_matrika = [8*[0] for _ in range(8)]
 
-        # Če uporabnik zapre okno naj se poklice self.zapri_okno
+        # Če uporabnik zapre okno, se pokliče self.zapri_okno
         master.protocol("WM_DELETE_WINDOW", lambda: self.zapri_okno(master))
 
         # Glavni menu
@@ -35,13 +39,16 @@ class Gui():
                               command=lambda: self.zacni_igro())
 
 
-        # Napis, ki prikazuje stanje igre
-        vsota_beli=2
-        vsota_crni=2
-        self.napis1 = tkinter.StringVar(master, value='ČRNI:'+str(vsota_crni))
-        tkinter.Label(master, textvariable=self.napis1).grid(row=0, column=1)
-        self.napis2 = tkinter.StringVar(master, value='BELI:'+str(vsota_beli))
-        tkinter.Label(master, textvariable=self.napis2).grid(row=0, column=2)
+        # Napisi, ki prikazujejo stanje igre
+        
+        # Kdo je na potezi itd.
+        #self.napis = tkinter.StringVar(master, value='Othello vas izziva na dvoboj!')
+        #tkinter.Label(master, textvariable=self.napis).grid(row=2, column=0)
+        # Števca žetonov
+        self.napis1 = tkinter.StringVar(master, value='ČRNI: 2')
+        tkinter.Label(master, textvariable=self.napis1, font=("Verdana", 16, "bold")).grid(row=0, column=1)
+        self.napis2 = tkinter.StringVar(master, value='BELI: 2')
+        tkinter.Label(master, textvariable=self.napis2, font=("Verdana", 16, "bold")).grid(row=0, column=2)
 
         # Igralno območje
         self.plosca = tkinter.Canvas(master, width=8*Gui.VELIKOST_POLJA + 2*Gui.X_0,
@@ -51,7 +58,7 @@ class Gui():
 
         # Črte na igralnem polju
         self.narisi_crte()
-        self.narisi_zacetno_pozicijo()
+        
 
         # Naročimo se na dogodek Button-1 na self.plosca,
         self.plosca.bind("<Button-1>", self.plosca_klik)
@@ -60,35 +67,46 @@ class Gui():
         self.zacni_igro()
 
     def zacni_igro(self):
-        #NI ŠE
         """Nastavi stanje igre na zacetek igre.
            Za igralca uporabi dana igralca."""
-        # Ustavimo vse igralce (ki morda razmišljajo)
         self.prekini_igralce()
         # Nastavimo igralce
-        self.igralec_x = Clovek(self)
-        self.igralec_o = Clovek(self)
+        self.igralec_crni = Clovek(self)
+        self.igralec_beli = Clovek(self)
         # Pobrišemo vse figure s polja
         self.plosca.delete(Gui.TAG_FIGURA)
         # Ustvarimo novo igro
-        self.igra = Igra()
-        # Križec je prvi na potezi
-        self.napis.set("Na potezi je X.")
-        self.igralec_x.igraj()
+        self.igra = Logika()
+        self.narisi_zacetno_pozicijo()
+        # Črni igralec je prvi na potezi
+        #self.napis.set("Na potezi je črni.")
+        self.igralec_crni.igraj()
         
-    def koncaj_igro(self):
+    def koncaj_igro(self, crni, beli):
         """Nastavi stanje igre na konec igre."""
-        self.napis.set("Konec igre.")
+        #self.napis.set("Konec igre.")
+        if crni > beli:
+            #self.napis.set("Zmagal je črni.")
+            pass
+        elif beli > crni:
+            #self.napis.set("Zmagal je beli.")
+            pass
+        else:
+            #self.napis.set("Neodločeno.")
+            pass
+            
+        
 
     def prekini_igralce(self):
-        #NI ŠE
         """Sporoči igralcem, da morajo nehati razmišljati."""
-        if self.igralec_x: self.igralec_x.prekini()
-        if self.igralec_o: self.igralec_o.prekini()
+        if self.igralec_beli:
+            self.igralec_beli.prekini()
+        if self.igralec_crni:
+            self.igralec_crni.prekini()
 
     def zapri_okno(self, master):
         """Ta metoda se pokliče, ko uporabnik zapre aplikacijo."""
-        # Kasneje bo tu treba še kaj narediti
+        self.prekini_igralce()
         master.destroy()
 
 
@@ -110,71 +128,79 @@ class Gui():
     
 
     def narisi_belega(self, p):
-        """Nariši križec v polje (i, j)."""
-        x = p[0] * Gui.VELIKOST_POLJA + Gui.X_0
-        y = p[1] * Gui.VELIKOST_POLJA + Gui.Y_0
+        """Nariši bel žeton v polje (i, j)."""
+        x = p[1] * Gui.VELIKOST_POLJA + Gui.X_0
+        y = p[0] * Gui.VELIKOST_POLJA + Gui.Y_0
         sirina = 1
-        self.plosca.create_oval(x+10, y+10, x+40, y+40,
-                                width=sirina,tag=Gui.TAG_FIGURA)
+        zeton = self.plosca.create_oval(x+10, y+10, x+40, y+40,
+                                        width=sirina, tag=Gui.TAG_FIGURA)
+        self.id_matrika[p[0]][p[1]] = zeton
         
     def narisi_crnega(self, p):
-        """Nariši krožec v polje (i, j)."""
-        x = p[0] * Gui.VELIKOST_POLJA + Gui.X_0
-        y = p[1] * Gui.VELIKOST_POLJA + Gui.Y_0
+        """Nariši črn žeton v polje (i, j)."""
+        x = p[1] * Gui.VELIKOST_POLJA + Gui.X_0
+        y = p[0] * Gui.VELIKOST_POLJA + Gui.Y_0
         sirina = 1
-        self.plosca.create_oval(x+10, y+10, x+40, y+40,
-                                width=sirina,tag=Gui.TAG_FIGURA, fill='black')
-
-
-
-
-    def plosca_klik(self, event):
-        """Obdelaj klik na ploščo."""
-        # Tistemu, ki je na potezi, povemo, da je uporabnik kliknil na ploščo.
-        # Podamo mu potezo p.
-        i = (event.x - Gui.X_0)// Gui.VELIKOST_POLJA 
-        j = (event.y - Gui.Y_0) // Gui.VELIKOST_POLJA 
-        print ("Klik na ({0}, {1}), polje ({2}, {3})".format(event.x, event.y, i, j))
-        self.povleci_potezo((i,j))
+        zeton = self.plosca.create_oval(x+10, y+10, x+40, y+40,
+                                        width=sirina,tag=Gui.TAG_FIGURA,
+                                        fill='black')
+        self.id_matrika[p[0]][p[1]] = zeton
 
     def plosca_klik(self, event):
-        #NI ŠE
-        """Obdelaj klik na ploščo."""
+        """Odzovi se na klik na ploščo."""
         # Tistemu, ki je na potezi, povemo, da je uporabnik kliknil na ploščo.
-        # Podamo mu potezo p.
-        i = (event.x - Gui.X_0)// Gui.VELIKOST_POLJA 
-        j = (event.y - Gui.Y_0) // Gui.VELIKOST_POLJA 
-        if 0 <= i <= 2 and 0 <= j <= 2:
-            if self.igra.na_potezi == IGRALEC_X:
-                self.igralec_x.klik((i,j))
-            elif self.igra.na_potezi == IGRALEC_O:
-                self.igralec_o.klik((i,j))
+        st = (event.x - Gui.X_0)// Gui.VELIKOST_POLJA 
+        vr = (event.y - Gui.Y_0) // Gui.VELIKOST_POLJA
+        
+        if 0 <= vr <= 7 and 0 <= st <= 7:
+            if self.igra.na_potezi == IGRALEC_C:
+                self.igralec_crni.klik((vr, st))
+            elif self.igra.na_potezi == IGRALEC_B:
+                self.igralec_beli.klik((vr, st))
             else:
-                # Nihče ni na potezi, ne naredimo nič
+                # Nihče ni na potezi
                 pass
         else:
             # klik izven plošče
             pass
+
+
+    def pobarvaj_vmesne(self):
+        plosca = self.igra.plosca
+        for vr in range(len(plosca)):
+            for st in range(len(plosca[0])):
+                if plosca[vr][st] == "B":
+                    self.plosca.delete(self.id_matrika[vr][st])
+                    self.narisi_belega((vr, st))
+                elif plosca[vr][st] == "C":
+                    self.plosca.delete(self.id_matrika[vr][st])
+                    self.narisi_crnega((vr, st))
+                
     
         
     def povleci_potezo(self, p):
-        #NI ŠE
         """Povleci potezo p, če je veljavna. Če ni veljavna, ne naredi nič."""
-        # Najprej povlečemo potezo v igri, še pred tem si zapomnimo, kdo jo je povlekel
-        # (ker bo self.igra.povleci_potezo spremenil stanje igre).
-        # GUI se *ne* ukvarja z logiko igre, zato ne preverja, ali je poteza veljavna.
-        # Ta del bo kasneje za njega opravil self.igra.
         igralec = self.igra.na_potezi
-        self.igra.povleci_potezo(p)
-        if igralec == IGRALEC_B:
-            self.narisi_X(p)
-        elif igralec == IGRALEC_C:
-            self.narisi_O(p)
-        # Popravimo napis, kdo je na potezi
-        self.napis.set("Na potezi je {0}".format(
-            'X' if self.igra.na_potezi == IGRALEC_X else 'O'))
-
-
+        s = self.igra.povleci_potezo(p)
+        if s is None:
+            pass
+        else:
+            self.pobarvaj_vmesne()
+            (stanje, crni, beli) = s
+            self.napis1.set('ČRNI: '+str(crni))
+            self.napis2.set('BELI: '+str(beli))
+            
+            if stanje == NI_KONEC:
+                if self.igra.na_potezi == IGRALEC_C:
+                    #self.napis.set("Na potezi je X.")
+                    self.igralec_crni.igraj()
+                elif self.igra.na_potezi == IGRALEC_B:
+                    #self.napis.set("Na potezi je O.")
+                    self.igralec_beli.igraj()
+            else:
+                self.koncaj_igro(crni, beli)
+            
+        
 
 
 
