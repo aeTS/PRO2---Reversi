@@ -1,7 +1,14 @@
 import tkinter
+import argparse   # za argumente iz ukazne vrstice
+import logging
+MINIMAX_GLOBINA = 3
 
 from logika import *
 from clovek import *
+from racunalnik import *
+##########################################################################
+#Uporabniški vmesnik
+
 
 class Gui():
     
@@ -15,7 +22,7 @@ class Gui():
 
     X_0=7
     Y_0=7
-
+    
     
     def __init__(self, master):
         # Objekti, ki predstavljajo belega, črnega igralca in igro
@@ -37,23 +44,37 @@ class Gui():
         menu.add_cascade(label="Igra", menu=menu_igra)
         menu_igra.add_command(label="Nova igra",
                               command=lambda: self.zacni_igro())
+        menu_igra.add_command(label="črni=Človek, beli=Človek",
+                              command=lambda: self.zacni_igro(Clovek(self),
+                                                              Clovek(self)))
+        menu_igra.add_command(label="črni=Človek, beli=Računalnik",
+                              command=lambda: self.zacni_igro(Clovek(self),
+                                                              Racunalnik(self, Minimax(globina))))
+        menu_igra.add_command(label="črni=Računalnik, beli=Računalnik",
+                              command=lambda: self.zacni_igro(Racunalnik(self, Minimax(globina)),
+                                                              Racunalnik(self, Minimax(globina))))
+
+
 
 
         # Napisi, ki prikazujejo stanje igre
         
         # Kdo je na potezi itd.
-        #self.napis = tkinter.StringVar(master, value='Othello vas izziva na dvoboj!')
-        #tkinter.Label(master, textvariable=self.napis).grid(row=2, column=0)
+        self.napis = tkinter.StringVar(master, value='Othello vas izziva na dvoboj!')
+        self.start = tkinter.Button(master, text="Začni igro",command=self.zacni_igro)
+        
+        tkinter.Label(master, textvariable=self.napis, font=("Verdana", 16, "bold")).grid(row=0, column=0, columnspan=4)
+        tkinter.Label(master, textvariable=self.start).grid(row=0, column=0, columnspan=4)
         # Števca žetonov
         self.napis1 = tkinter.StringVar(master, value='ČRNI: 2')
-        tkinter.Label(master, textvariable=self.napis1, font=("Verdana", 16, "bold")).grid(row=0, column=1)
+        tkinter.Label(master, textvariable=self.napis1, font=("Verdana", 16, "bold")).grid(row=1, column=1)
         self.napis2 = tkinter.StringVar(master, value='BELI: 2')
-        tkinter.Label(master, textvariable=self.napis2, font=("Verdana", 16, "bold")).grid(row=0, column=2)
+        tkinter.Label(master, textvariable=self.napis2, font=("Verdana", 16, "bold")).grid(row=1, column=2)
 
         # Igralno območje
         self.plosca = tkinter.Canvas(master, width=8*Gui.VELIKOST_POLJA + 2*Gui.X_0,
                                      height=8*Gui.VELIKOST_POLJA+ 2*Gui.Y_0)
-        self.plosca.grid(row=1, column=0, columnspan=4)
+        self.plosca.grid(row=2, column=0, columnspan=4)
 
 
         # Črte na igralnem polju
@@ -63,8 +84,9 @@ class Gui():
         # Naročimo se na dogodek Button-1 na self.plosca,
         self.plosca.bind("<Button-1>", self.plosca_klik)
 
-        # Prični igro v načinu človek proti človeku
-        self.zacni_igro()
+
+        # Prični igro v načinu človek proti računalniku
+        self.zacni_igro(Clovek(self), Racunalnik(self, Minimax(globina)))
 
     def zacni_igro(self):
         """Nastavi stanje igre na zacetek igre.
@@ -86,13 +108,13 @@ class Gui():
         """Nastavi stanje igre na konec igre."""
         #self.napis.set("Konec igre.")
         if crni > beli:
-            #self.napis.set("Zmagal je črni.")
+            self.napis.set("Zmagal je črni.")
             pass
         elif beli > crni:
-            #self.napis.set("Zmagal je beli.")
+            self.napis.set("Zmagal je beli.")
             pass
         else:
-            #self.napis.set("Neodločeno.")
+            self.napis.set("Neodločeno.")
             pass
             
         
@@ -162,6 +184,7 @@ class Gui():
                 pass
         else:
             # klik izven plošče
+            logging.debug("klik izven plošče {0}, polje {1}".format((event.x,event.y), (i,j)))
             pass
 
 
@@ -192,10 +215,10 @@ class Gui():
             
             if stanje == NI_KONEC:
                 if self.igra.na_potezi == IGRALEC_C:
-                    #self.napis.set("Na potezi je X.")
+                    self.napis.set("Na potezi je črni.")
                     self.igralec_crni.igraj()
                 elif self.igra.na_potezi == IGRALEC_B:
-                    #self.napis.set("Na potezi je O.")
+                    self.napis.set("Na potezi je beli.")
                     self.igralec_beli.igraj()
             else:
                 self.koncaj_igro(crni, beli)
@@ -208,17 +231,47 @@ class Gui():
 
 
 
-
+#############################################################################
+#Glavni program
 
 
 
             
         
 if __name__ == "__main__":
-    
+    # Iz ukazne vrstice poberemo globino za minimax, uporabimo
+    # modul argparse, glej https://docs.python.org/3.4/library/argparse.html
+
+    # Opišemo argumente, ki jih sprejmemo iz ukazne vrstice
+    parser = argparse.ArgumentParser(description="Igrica Reversi.")
+    # Argument --globina n, s privzeto vrednostjo MINIMAX_GLOBINA
+    parser.add_argument('--globina',
+                        default=MINIMAX_GLOBINA,
+                        type=int,
+                        help='globina iskanja za minimax algoritem')
+    # Argument --debug, ki vklopi sporočila o tem, kaj se dogaja
+    parser.add_argument('--debug',
+                        action='store_true',
+                        help='vklopi sporočila o dogajanju')
+
+    # Obdelamo argumente iz ukazne vrstice
+    args = parser.parse_args()
+
+    # Vklopimo sporočila, če je uporabnik podal --debug
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+
+    # Naredimo glavno okno in nastavimo ime
     root = tkinter.Tk()
     root.title("Reversi")
-    aplikacija = Gui(root)
+
+    # Naredimo objekt razreda Gui in ga spravimo v spremenljivko,
+    # sicer bo Python mislil, da je objekt neuporabljen in ga bo pobrisal
+    # iz pomnilnika.
+    aplikacija = Gui(root, args.globina)
+
+    # Kontrolo prepustimo glavnemu oknu. Funkcija mainloop neha
+    # delovati, ko okno zapremo.
     root.mainloop()
 
 

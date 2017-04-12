@@ -33,7 +33,7 @@ class Logika():
 
     def kopija(self):
         """Vrni kopijo te igre, brez zgodovine."""
-        k = Igra()
+        k = Logika()
         k.plosca = [self.plosca[i][:] for i in range(8)]
         k.na_potezi = self.na_potezi
         return k
@@ -53,14 +53,15 @@ class Logika():
             for j in range(len(plosca[0])):
                 if plosca[i][j] == igralec:
                     i1 = i
-                    i2 = i
                     j1 = j
-                    j2 = j
+                    #DESNO
                     for elem in plosca[i][j+1:8]:
                         j1 += 1
                         if elem == igralec:
+                            
                             break
                         elif elem == PRAZNO and j1 == j+1:
+                            
                             break
                         elif elem == PRAZNO:
                             if (i, j1) not in poteze:
@@ -68,26 +69,35 @@ class Logika():
                             else:
                                 poteze[(i, j1)].append((i, j))
                             break
+                    j1 = j
+                           
+                        
                 
-
+                    #LEVO
                     for elem in plosca[i][0:j][::-1]:
-                        j2 -= 1
+                        j1 -= 1
                         if elem == igralec:
+                            
                             break
-                        elif elem == PRAZNO and j2 == j-1:
+                        elif elem == PRAZNO and j1 == j-1:
+                        
                             break
                         elif elem == PRAZNO:
-                            if (i, j2) not in poteze:
-                                poteze[(i, j2)] = [(i, j)]
+                            if (i, j1) not in poteze:
+                                poteze[(i, j1)] = [(i, j)]
                             else:
-                                poteze[(i, j2)].append((i, j))
+                                poteze[(i, j1)].append((i, j))
                             break
-
+                    j1 = j
+                            
+                    #DOL
                     for elem in plosca[i+1:8]:
                         i1 += 1
                         if elem[j] == igralec:
+                            
                             break
                         elif elem[j] == PRAZNO and i1 == i+1:
+                            
                             break
                         elif elem[j] == PRAZNO:
                             if (i1, j) not in poteze:
@@ -95,20 +105,107 @@ class Logika():
                             else:
                                 poteze[(i1, j)].append((i, j))
                             break
+                    i1 = i
+                            
                         
-
+                    #GOR
                     for elem in plosca[0:i][::-1]:
-                        i2 -= 1
+                        i1 -= 1
                         if elem[j] == igralec:
+                            
                             break
-                        elif elem[j] == PRAZNO and i2 == i-1:
+                        elif elem[j] == PRAZNO and i1 == i-1:
+                            
                             break
                         elif elem[j] == PRAZNO:
-                            if (i2, j) not in poteze:
-                                poteze[(i2, j)] = [(i, j)]
+                            if (i1, j) not in poteze:
+                                poteze[(i1, j)] = [(i, j)]
                             else:
-                                poteze[(i2, j)].append((i, j))
+                                poteze[(i1, j)].append((i, j))
                             break
+                    i1 = i
+                           
+                    #DIAGONALNO DESNO GOR
+                    for k in range(j+1,8):
+                        
+                        i1 += 1
+                        if i1 < 8:
+                            if plosca[i1][k] == igralec:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO and i1 == i+1:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO:
+                                if (i1, k) not in poteze:
+                                    poteze[(i1, k)] = [(i, j)]
+                                else:
+                                    poteze[(i1, k)].append((i, j))
+                                break
+                    i1 = i
+                                
+                            
+                    #DIAGONALNO DESNO DOL
+                    for k in range(j+1,8):
+                        i1 -= 1
+                        
+                        if i1 >= 0:
+                            print((i1, k))
+                            if plosca[i1][k] == igralec:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO and i1 == i-1:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO:
+                                if (i1, k) not in poteze:
+                                    poteze[(i1, k)] = [(i, j)]
+                                else:
+                                    poteze[(i1, k)].append((i, j))
+                                break
+                            
+                    i1 = i
+                                
+                    #DIAGONALNO LEVO GOR
+                    for k in range(j - 1, -1, -1):
+                        
+                        i1 -= 1
+                        if i1 >= 0:
+                            if plosca[i1][k] == igralec:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO and i1 == i-1:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO:
+                                if (i1, k) not in poteze:
+                                    poteze[(i1, k)] = [(i, j)]
+                                else:
+                                    poteze[(i1, k)].append((i, j))
+                                break
+                    i1 = i
+                               
+                            
+                    #DIAGONALNO LEVO DOL
+                    for k in range(j - 1, -1, -1):
+                        
+                        i1 += 1
+                        if i1 < 8:
+                            if plosca[i1][k] == igralec:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO and i1 == i+1:
+                                
+                                break
+                            elif plosca[i1][k] == PRAZNO:
+                                if (i1, k) not in poteze:
+                                    poteze[(i1, k)] = [(i, j)]
+                                else:
+                                    poteze[(i1, k)].append((i, j))
+                                break
+                    i1 = i
+                                
+                    
 
         return poteze
                     
@@ -124,8 +221,8 @@ class Logika():
         if p in mozne_poteze:
             self.shrani_pozicijo()
             self.plosca[i][j] = self.na_potezi
-            
             for (i1, j1) in mozne_poteze[p]:
+                #pobarva levo-desno-gor-dol
                 if i == i1 and j < j1:
                     for k in range(j + 1, j1 + 1):
                         self.plosca[i][k] = self.na_potezi
@@ -138,6 +235,28 @@ class Logika():
                 if j == j1 and i > i1:
                     for k in range(i1, i):
                         self.plosca[k][j] = self.na_potezi
+                #pobarva diagonalno
+                st = j1
+                if i > i1 and j < j1:
+                    for k in range(i1 + 1, i):
+                        st -= 1
+                        self.plosca[k][st] = self.na_potezi
+                    st = j1
+                if i > i1 and j > j1:
+                    for k in range(i1 + 1, i):
+                        st += 1
+                        self.plosca[k][st] = self.na_potezi
+                    st = j1
+                if i < i1 and j < j1:
+                    for k in range(i1 - 1, i, -1):
+                        st -= 1
+                        self.plosca[k][st] = self.na_potezi
+                    st = j1
+                if i < i1 and j > j1:
+                    for k in range(i1 - 1, i, -1):
+                        st += 1
+                        self.plosca[k][st] = self.na_potezi
+                    st = j1
                 
             
             (stanje, crni, beli) = self.stanje_igre()
