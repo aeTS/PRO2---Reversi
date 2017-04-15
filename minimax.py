@@ -1,7 +1,6 @@
 import logging
 
-from logika import (IGRALEC_B, IGRALEC_C, PRAZNO, KONEC, NI_KONEC,
-nasprotnik)
+from logika import (IGRALEC_B, IGRALEC_C, PRAZNO, KONEC, NI_KONEC, nasprotnik)
 
 from reversi import *
 
@@ -43,7 +42,7 @@ class Minimax:
             self.poteza = poteza
 
     # Vrednosti igre
-    ZMAGA = 100000 # Mora biti vsaj 10^5
+    ZMAGA = 100000 
     NESKONCNO = ZMAGA + 1 # Več kot zmaga
     VREDNOST_KOTA = 10000
     VREDNOST_ROBNE = 1000
@@ -51,31 +50,29 @@ class Minimax:
 
     def vrednost_pozicije(self):
         """Ocena vrednosti pozicije: sešteje vrednosti vseh trojk na plošči."""
-        # Slovar, ki pove, koliko so vredne posamezne trojke, kjer "(x,y) : v" pomeni:
-        # če imamo v trojki x znakov igralca in y znakov nasprotnika (in 3-x-y praznih polj),
-        # potem je taka trojka za self.jaz vredna v.
-        # Trojke, ki se ne pojavljajo v slovarju, so vredne 0.
         robni_jaz = 0
         robni_nasprotnik = 0
-        koti_jaz = VREDNOST_KOTA * [plosca[0][0], plosca[0][7], plosca[7][0], plosca[7][7]].count(self.jaz)
-        koti_nasprotnik = -VREDNOST_KOTA * [plosca[0][0], plosca[0][7],
-                                            plosca[7][0], plosca[7][7]].count(nasprotnik(self.jaz)) 
+        plosca = self.igra.plosca
+        koti_jaz = Minimax.VREDNOST_KOTA * [plosca[0][0], plosca[0][7], plosca[7][0], plosca[7][7]].count(self.jaz)
+        koti_nasprotnik = -Minimax.VREDNOST_KOTA * [plosca[0][0], plosca[0][7],
+                                                    plosca[7][0], plosca[7][7]].count(nasprotnik(self.jaz)) 
         (stanje, crni, beli) = self.igra.stanje_igre()
         stevilo_moznih_potez = 0
-        slovar_potez = self.igra.mozne_poteze
+        slovar_potez = self.igra.mozne_poteze()
+        
         for elem in slovar_potez:
-            stevilo_moznih_potez += len(elem) * VREDNOST_MOZNE_POTEZE
+            stevilo_moznih_potez += len(elem) * Minimax.VREDNOST_MOZNE_POTEZE
         
         for k in range(1, 7):
             for j in [0,7]:
                 if plosca[j][k] == self.jaz:
-                    robni_jaz += VREDNOST_ROBNE
+                    robni_jaz += Minimax.VREDNOST_ROBNE
                 elif plosca[k][j] == self.jaz:
-                    robni_jaz += VREDNOST_ROBNE
+                    robni_jaz += Minimax.VREDNOST_ROBNE
                 elif plosca[j][k] == nasprotnik(self.jaz):
-                    robni_nasprotnik -= VREDNOST_ROBNE
+                    robni_nasprotnik -= Minimax.VREDNOST_ROBNE
                 elif plosca[k][j] == nasprotnik(self.jaz):
-                    robni_nasprotnik -= VREDNOST_ROBNE
+                    robni_nasprotnik -= Minimax.VREDNOST_ROBNE
         
           
         
@@ -113,7 +110,7 @@ class Minimax:
                     # Maksimiziramo
                     najboljsa_poteza = None
                     vrednost_najboljse = -Minimax.NESKONCNO
-                    for p in self.igra.veljavne_poteze():
+                    for p in self.igra.mozne_poteze():
                         self.igra.povleci_potezo(p)
                         vrednost = self.minimax(globina-1, not maksimiziramo)[1]
                         self.igra.razveljavi()
@@ -124,7 +121,7 @@ class Minimax:
                     # Minimiziramo
                     najboljsa_poteza = None
                     vrednost_najboljse = Minimax.NESKONCNO
-                    for p in self.igra.veljavne_poteze():
+                    for p in self.igra.mozne_poteze():
                         self.igra.povleci_potezo(p)
                         vrednost = self.minimax(globina-1, not maksimiziramo)[1]
                         self.igra.razveljavi()

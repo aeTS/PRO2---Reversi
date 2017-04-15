@@ -1,11 +1,14 @@
 import tkinter
 import argparse   # za argumente iz ukazne vrstice
 import logging
+
 MINIMAX_GLOBINA = 3
+
 
 from logika import *
 from clovek import *
 from racunalnik import *
+
 ##########################################################################
 #Uporabniški vmesnik
 
@@ -24,7 +27,7 @@ class Gui():
     Y_0=7
     
     
-    def __init__(self, master):
+    def __init__(self, master, globina):
         # Objekti, ki predstavljajo belega, črnega igralca in igro
         self.igralec_beli = None 
         self.igralec_crni = None
@@ -61,10 +64,10 @@ class Gui():
         
         # Kdo je na potezi itd.
         self.napis = tkinter.StringVar(master, value='Othello vas izziva na dvoboj!')
-        self.start = tkinter.Button(master, text="Začni igro",command=self.zacni_igro)
+        #self.start = tkinter.Button(master, text="Začni igro",command=self.zacni_igro(Clovek(self), Racunalnik(self, Minimax(globina))))
         
         tkinter.Label(master, textvariable=self.napis, font=("Verdana", 16, "bold")).grid(row=0, column=0, columnspan=4)
-        tkinter.Label(master, textvariable=self.start).grid(row=0, column=0, columnspan=4)
+        #tkinter.Label(master, textvariable=self.start).grid(row=0, column=0, columnspan=4)
         # Števca žetonov
         self.napis1 = tkinter.StringVar(master, value='ČRNI: 2')
         tkinter.Label(master, textvariable=self.napis1, font=("Verdana", 16, "bold")).grid(row=1, column=1)
@@ -88,17 +91,18 @@ class Gui():
         # Prični igro v načinu človek proti računalniku
         self.zacni_igro(Clovek(self), Racunalnik(self, Minimax(globina)))
 
-    def zacni_igro(self):
+    def zacni_igro(self, igralec_crni, igralec_beli):
         """Nastavi stanje igre na zacetek igre.
            Za igralca uporabi dana igralca."""
         self.prekini_igralce()
-        # Nastavimo igralce
-        self.igralec_crni = Clovek(self)
-        self.igralec_beli = Clovek(self)
         # Pobrišemo vse figure s polja
         self.plosca.delete(Gui.TAG_FIGURA)
         # Ustvarimo novo igro
         self.igra = Logika()
+        # Nastavimo igralce
+        self.igralec_crni = igralec_crni
+        self.igralec_beli = igralec_beli
+        
         self.narisi_zacetno_pozicijo()
         # Črni igralec je prvi na potezi
         #self.napis.set("Na potezi je črni.")
