@@ -2,7 +2,7 @@ import logging
 
 from logika import (IGRALEC_B, IGRALEC_C, PRAZNO, KONEC, NI_KONEC, nasprotnik)
 
-from reversi import *
+import random
 
 
 ######################################################################
@@ -33,7 +33,7 @@ class Minimax:
         self.jaz = self.igra.na_potezi
         self.poteza = None # Sem napišemo potezo, ko jo najdemo
         # Poženemo minimax
-        (poteza, vrednost) = self.minimax(self.globina, True)
+        (poteza, vrednost) = self.minimax(self.globina, True, -Minimax.NESKONCNO, Minimax.NESKONCNO)
         self.jaz = None
         self.igra = None
         if not self.prekinitev:
@@ -80,7 +80,7 @@ class Minimax:
                 koti_nasprotnik + stevilo_moznih_potez)
     
 
-    def minimax(self, globina, maksimiziramo):
+    def minimax(self, globina, maksimiziramo, alfa, beta):
         """Glavna metoda minimax."""
         if self.prekinitev:
             # Sporočili so nam, da moramo prekiniti
@@ -105,29 +105,53 @@ class Minimax:
             if globina == 0:
                 return (None, self.vrednost_pozicije())
             else:
+                
                 # Naredimo eno stopnjo minimax
                 if maksimiziramo:
+                    sez_najboljsih_potez = []
                     # Maksimiziramo
                     najboljsa_poteza = None
                     vrednost_najboljse = -Minimax.NESKONCNO
                     for p in self.igra.mozne_poteze():
                         self.igra.povleci_potezo(p)
-                        vrednost = self.minimax(globina-1, not maksimiziramo)[1]
+                        vrednost = self.minimax(globina-1, not maksimiziramo, alfa, beta)[1]
+                        vrednost_najboljse = max(vrednost_najboljse,
+                                                 self.minimax(globina-1, not maksimiziramo, alfa, beta)[1])
+                        
+
+                        
+                        alfa = max(alfa, vrednost_najboljse)
                         self.igra.razveljavi()
-                        if vrednost > vrednost_najboljse:
-                            vrednost_najboljse = vrednost
-                            najboljsa_poteza = p
+                        if alfa > vrednost:
+                            continue
+                        if vrednost >= vrednost_najboljse:
+                            sez_najboljsih_potez.append(p)
+                            
+                        if beta <= alfa:
+                            break
+                    najboljsa_poteza = random.choice(sez_najboljsih_potez)
+                       
+                        
                 else:
                     # Minimiziramo
+                    sez_najboljsih_potez = []
                     najboljsa_poteza = None
                     vrednost_najboljse = Minimax.NESKONCNO
                     for p in self.igra.mozne_poteze():
                         self.igra.povleci_potezo(p)
-                        vrednost = self.minimax(globina-1, not maksimiziramo)[1]
+                        vrednost = self.minimax(globina-1, not maksimiziramo, alfa, beta)[1]
+                        vrednost_najboljse = min(vrednost_najboljse,
+                                                 self.minimax(globina-1, not maksimiziramo, alfa, beta)[1])
+                        
+                        beta = max(beta, vrednost_najboljse)
                         self.igra.razveljavi()
-                        if vrednost < vrednost_najboljse:
-                            vrednost_najboljse = vrednost
-                            najboljsa_poteza = p
+                        if beta < vrednost:
+                            continue
+                        if vrednost <= vrednost_najboljse:
+                            sez_najboljsih_potez.append(p)
+                        if beta <= alfa:
+                            break
+                    najboljsa_poteza = random.choice(sez_najboljsih_potez)
 
                 assert (najboljsa_poteza is not None), "minimax: izračunana poteza je None"
                 return (najboljsa_poteza, vrednost_najboljse)

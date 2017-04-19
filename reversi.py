@@ -2,7 +2,7 @@ import tkinter
 import argparse   # za argumente iz ukazne vrstice
 import logging
 
-MINIMAX_GLOBINA = 3
+MINIMAX_GLOBINA = 1
 
 
 from logika import *
@@ -46,7 +46,8 @@ class Gui():
         menu_igra = tkinter.Menu(menu)
         menu.add_cascade(label="Igra", menu=menu_igra)
         menu_igra.add_command(label="Nova igra",
-                              command=lambda: self.zacni_igro())
+                              command=lambda: self.zacni_igro(Clovek(self),
+                                                              Racunalnik(self, Minimax(globina))))
         menu_igra.add_command(label="črni=Človek, beli=Človek",
                               command=lambda: self.zacni_igro(Clovek(self),
                                                               Clovek(self)))
@@ -58,16 +59,20 @@ class Gui():
                                                               Racunalnik(self, Minimax(globina))))
 
 
+        
+
+        
+        
 
 
         # Napisi, ki prikazujejo stanje igre
         
         # Kdo je na potezi itd.
-        self.napis = tkinter.StringVar(master, value='Othello vas izziva na dvoboj!')
-        #self.start = tkinter.Button(master, text="Začni igro",command=self.zacni_igro(Clovek(self), Racunalnik(self, Minimax(globina))))
+        self.napis = tkinter.Canvas(master, width=8*Gui.VELIKOST_POLJA + 2*Gui.X_0,
+                                     height=Gui.VELIKOST_POLJA+ 2*Gui.Y_0)
+        self.napis.grid(row=0, column=0, columnspan=4)
+    
         
-        tkinter.Label(master, textvariable=self.napis, font=("Verdana", 16, "bold")).grid(row=0, column=0, columnspan=4)
-        #tkinter.Label(master, textvariable=self.start).grid(row=0, column=0, columnspan=4)
         # Števca žetonov
         self.napis1 = tkinter.StringVar(master, value='ČRNI: 2')
         tkinter.Label(master, textvariable=self.napis1, font=("Verdana", 16, "bold")).grid(row=1, column=1)
@@ -79,10 +84,8 @@ class Gui():
                                      height=8*Gui.VELIKOST_POLJA+ 2*Gui.Y_0)
         self.plosca.grid(row=2, column=0, columnspan=4)
 
-
         # Črte na igralnem polju
         self.narisi_crte()
-        
 
         # Naročimo se na dogodek Button-1 na self.plosca,
         self.plosca.bind("<Button-1>", self.plosca_klik)
@@ -105,17 +108,25 @@ class Gui():
         
         self.narisi_zacetno_pozicijo()
         # Črni igralec je prvi na potezi
-        #self.napis.set("Na potezi je črni.")
+        self.napis.create_text(200, 25, text = "Na potezi je: ",
+                               font=("Verdana", 16, "bold"))
+        self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
         self.igralec_crni.igraj()
         
     def koncaj_igro(self, crni, beli):
         """Nastavi stanje igre na konec igre."""
         #self.napis.set("Konec igre.")
         if crni > beli:
-            self.napis.set("Zmagal je črni.")
+            self.napis.delete("all")
+            self.napis.create_text(200, 25, text = "Zmagal je: ",
+                                   font=("Verdana", 16, "bold"))
+            self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
             pass
         elif beli > crni:
-            self.napis.set("Zmagal je beli.")
+            self.napis.delete("all")
+            self.napis.create_text(200, 25, text = "Zmagal je: ",
+                                   font=("Verdana", 16, "bold"))
+            self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
             pass
         else:
             self.napis.set("Neodločeno.")
@@ -219,10 +230,18 @@ class Gui():
             
             if stanje == NI_KONEC:
                 if self.igra.na_potezi == IGRALEC_C:
-                    self.napis.set("Na potezi je črni.")
+                    self.napis.delete("all")
+                    self.napis.create_text(200, 25, text = "Na potezi je: ",
+                               font=("Verdana", 16, "bold"))
+                    self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
+                    
                     self.igralec_crni.igraj()
                 elif self.igra.na_potezi == IGRALEC_B:
-                    self.napis.set("Na potezi je beli.")
+                    self.napis.delete("all")
+                    self.napis.create_text(200, 25, text = "Na potezi je: ",
+                               font=("Verdana", 16, "bold"))
+                    self.zeton = self.napis.create_oval(300, 15, 325, 40)
+                    
                     self.igralec_beli.igraj()
             else:
                 self.koncaj_igro(crni, beli)
