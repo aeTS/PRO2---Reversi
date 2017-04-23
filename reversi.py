@@ -115,7 +115,7 @@ class Gui():
         
     def koncaj_igro(self, crni, beli):
         """Nastavi stanje igre na konec igre."""
-        #self.napis.set("Konec igre.")
+        
         if crni > beli:
             self.napis.delete("all")
             self.napis.create_text(200, 25, text = "Zmagal je: ",
@@ -129,7 +129,9 @@ class Gui():
             self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
             pass
         else:
-            self.napis.set("Neodločeno.")
+            self.napis.delete("all")
+            self.napis.create_text(200, 25, text = "Neodločeno...",
+                                   font=("Verdana", 16, "bold"))
             pass
             
         
@@ -168,18 +170,20 @@ class Gui():
         """Nariši bel žeton v polje (i, j)."""
         x = p[1] * Gui.VELIKOST_POLJA + Gui.X_0
         y = p[0] * Gui.VELIKOST_POLJA + Gui.Y_0
-        sirina = 1
-        zeton = self.plosca.create_oval(x+10, y+10, x+40, y+40,
-                                        width=sirina, tag=Gui.TAG_FIGURA)
+        a = (1/5) * Gui.VELIKOST_POLJA
+        b = (4/5) * Gui.VELIKOST_POLJA
+        zeton = self.plosca.create_oval(x+a, y+a, x+b, y+b,
+                                        width=1, tag=Gui.TAG_FIGURA)
         self.id_matrika[p[0]][p[1]] = zeton
         
     def narisi_crnega(self, p):
         """Nariši črn žeton v polje (i, j)."""
         x = p[1] * Gui.VELIKOST_POLJA + Gui.X_0
         y = p[0] * Gui.VELIKOST_POLJA + Gui.Y_0
-        sirina = 1
-        zeton = self.plosca.create_oval(x+10, y+10, x+40, y+40,
-                                        width=sirina,tag=Gui.TAG_FIGURA,
+        a = (1/5) * Gui.VELIKOST_POLJA
+        b = (4/5) * Gui.VELIKOST_POLJA
+        zeton = self.plosca.create_oval(x+a, y+a, x+b, y+b,
+                                        width=1,tag=Gui.TAG_FIGURA,
                                         fill='black')
         self.id_matrika[p[0]][p[1]] = zeton
 
@@ -227,7 +231,7 @@ class Gui():
             (stanje, crni, beli) = s
             self.napis1.set('ČRNI: '+str(crni))
             self.napis2.set('BELI: '+str(beli))
-            
+            print(stanje)
             if stanje == NI_KONEC:
                 if self.igra.na_potezi == IGRALEC_C:
                     self.napis.delete("all")
@@ -243,7 +247,7 @@ class Gui():
                     self.zeton = self.napis.create_oval(300, 15, 325, 40)
                     
                     self.igralec_beli.igraj()
-            else:
+            elif stanje == KONEC:
                 self.koncaj_igro(crni, beli)
             
         

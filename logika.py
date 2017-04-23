@@ -262,7 +262,7 @@ class Logika():
             (stanje, crni, beli) = self.stanje_igre()
             if stanje == NI_KONEC:
                 self.na_potezi = nasprotnik(self.na_potezi)
-            else:
+            elif stanje == KONEC:
                 self.na_potezi = None
             return (stanje, crni, beli)
 
