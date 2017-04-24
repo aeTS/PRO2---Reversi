@@ -150,7 +150,6 @@ class Logika():
                         i1 -= 1
                         
                         if i1 >= 0:
-                            print((i1, k))
                             if plosca[i1][k] == igralec:
                                 
                                 break
@@ -217,7 +216,6 @@ class Logika():
         Vrne stanje_igre() po potezi ali None, ce je poteza neveljavna."""
         (i,j) = p
         mozne_poteze = self.mozne_poteze()
-        print(p, mozne_poteze)
         if p in mozne_poteze:
             self.shrani_pozicijo()
             self.plosca[i][j] = self.na_potezi
@@ -257,7 +255,7 @@ class Logika():
                         st += 1
                         self.plosca[k][st] = self.na_potezi
                     st = j1
-                
+            
             
             (stanje, crni, beli) = self.stanje_igre()
             if stanje == NI_KONEC:
@@ -265,6 +263,7 @@ class Logika():
             elif stanje == KONEC:
                 self.na_potezi = None
             return (stanje, crni, beli)
+            
 
 
 
@@ -279,8 +278,7 @@ class Logika():
                     beli += 1
                 elif plosca[i][j] == IGRALEC_C:
                     crni += 1
-        
-        if self.mozne_poteze == {}:
+        if self.mozne_poteze() == {}:
             return (KONEC, crni, beli)
         else:
             return (NI_KONEC, crni, beli)
@@ -307,6 +305,31 @@ class Logika():
 
 
 
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 
 

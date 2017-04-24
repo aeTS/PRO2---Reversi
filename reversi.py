@@ -1,5 +1,5 @@
 import tkinter
-import argparse   # za argumente iz ukazne vrstice
+import argparse  
 import logging
 
 MINIMAX_GLOBINA = 1
@@ -58,21 +58,20 @@ class Gui():
                               command=lambda: self.zacni_igro(Racunalnik(self, Minimax(globina)),
                                                               Racunalnik(self, Minimax(globina))))
 
+        menu_pomoc = tkinter.Menu(menu)
+        menu.add_cascade(label="Pomoč", menu=menu_pomoc)
+        menu_pomoc.add_command(label="Navodila",
+                              command=lambda: self.navodila())
+
 
         
 
         
-        
-
-
-        # Napisi, ki prikazujejo stanje igre
-        
-        # Kdo je na potezi itd.
         self.napis = tkinter.Canvas(master, width=8*Gui.VELIKOST_POLJA + 2*Gui.X_0,
                                      height=Gui.VELIKOST_POLJA+ 2*Gui.Y_0)
         self.napis.grid(row=0, column=0, columnspan=4)
     
-        
+        # Napisi, ki prikazujejo stanje igre
         # Števca žetonov
         self.napis1 = tkinter.StringVar(master, value='ČRNI: 2')
         tkinter.Label(master, textvariable=self.napis1, font=("Verdana", 16, "bold")).grid(row=1, column=1)
@@ -84,8 +83,7 @@ class Gui():
                                      height=8*Gui.VELIKOST_POLJA+ 2*Gui.Y_0)
         self.plosca.grid(row=2, column=0, columnspan=4)
 
-        # Črte na igralnem polju
-        self.narisi_crte()
+        
 
         # Naročimo se na dogodek Button-1 na self.plosca,
         self.plosca.bind("<Button-1>", self.plosca_klik)
@@ -94,19 +92,50 @@ class Gui():
         # Prični igro v načinu človek proti računalniku
         self.zacni_igro(Clovek(self), Racunalnik(self, Minimax(globina)))
 
+    def navodila(self):
+        self.napis.delete("all")
+        self.plosca.delete("all")
+        self.napis1.set('')
+        self.napis2.set('')
+        self.napis.create_text(200, 25, text = "Navodila za igro Reversi",
+                               font=("Verdana", 16, "bold"))
+        self.plosca.create_text(Gui.X_0, Gui.Y_0, anchor = "nw", font=("Verdana", 10),
+                                text="Igra se odvija na igralni plošči velikosti 8x8.\n"
+                                "Na voljo je 64 žetonov, ki so na eni strani beli, \nna drugi pa črni.\n \n"
+                                "PRAVILA IGRE:\n \n"
+                                "1. Igralca izbereta barvo svojih žetonov.\n"
+                                "2. Dana je začetna pozicija žetonov, vedno začne črni.\n"
+                                "3. Svoj žeton mora vsakič postaviti poleg nasprotnikovega,\n"
+                                "lahko vertikalno, horizontalno ali diagonalno.\n"
+                                "4. Tako položeni žeton ujame enega ali več nasprotnikovih\n"
+                                "žetonov med enega ali več svojih.\n"
+                                "Ujeti žetoni se obrnejo in zato zamenjajo barvo.\n"
+                                "5. Naslednji na potezi je beli.\n"
+                                "Igralca tako nadaljujeta, dokler ne zapolnita vseh polj\n"
+                                "ali dokler še imata možnost izvesti nadaljnjo potezo.\n"
+                                "6. Zmaga tisti, ki ima na plošči več žetonov svoje barve.")
+        
+        
+
     def zacni_igro(self, igralec_crni, igralec_beli):
         """Nastavi stanje igre na zacetek igre.
            Za igralca uporabi dana igralca."""
         self.prekini_igralce()
+        self.plosca.delete("all")
         # Pobrišemo vse figure s polja
         self.plosca.delete(Gui.TAG_FIGURA)
+        self.napis.delete("all")
         # Ustvarimo novo igro
         self.igra = Logika()
+        
         # Nastavimo igralce
         self.igralec_crni = igralec_crni
         self.igralec_beli = igralec_beli
         
         self.narisi_zacetno_pozicijo()
+        
+        self.napis1.set('ČRNI: 2')
+        self.napis2.set('BELI: 2')
         # Črni igralec je prvi na potezi
         self.napis.create_text(200, 25, text = "Na potezi je: ",
                                font=("Verdana", 16, "bold"))
@@ -126,7 +155,7 @@ class Gui():
             self.napis.delete("all")
             self.napis.create_text(200, 25, text = "Zmagal je: ",
                                    font=("Verdana", 16, "bold"))
-            self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
+            self.zeton = self.napis.create_oval(300, 15, 325, 40)
             pass
         else:
             self.napis.delete("all")
@@ -160,6 +189,7 @@ class Gui():
                                     8*d + Gui.X_0, k*d + Gui.Y_0, tag=Gui.TAG_OKVIR)
 
     def narisi_zacetno_pozicijo(self):
+        self.narisi_crte()
         self.narisi_belega((3,3))
         self.narisi_belega((4,4))
         self.narisi_crnega((3,4))
@@ -231,7 +261,7 @@ class Gui():
             (stanje, crni, beli) = s
             self.napis1.set('ČRNI: '+str(crni))
             self.napis2.set('BELI: '+str(beli))
-            print(stanje)
+            
             if stanje == NI_KONEC:
                 if self.igra.na_potezi == IGRALEC_C:
                     self.napis.delete("all")
@@ -308,6 +338,15 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
+        
+
+
+        
 
 
 
