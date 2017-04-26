@@ -279,6 +279,8 @@ class Gui():
                     self.igralec_beli.igraj()
             elif stanje == KONEC:
                 self.koncaj_igro(crni, beli)
+            else:
+                assert False, "nedifinirano stanje igre"
 
 
 
