@@ -2,7 +2,7 @@ import tkinter
 import argparse
 import logging
 
-MINIMAX_GLOBINA = 1
+MINIMAX_GLOBINA = 4
 
 
 from logika import *
@@ -233,7 +233,7 @@ class Gui():
                 pass
         else:
             # klik izven plošče
-            logging.debug("klik izven plošče {0}, polje {1}".format((event.x,event.y), (i,j)))
+            logging.debug("klik izven plošče {0}, polje {1}".format((event.x,event.y), (st,vr)))
             pass
 
 
