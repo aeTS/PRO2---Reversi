@@ -2,7 +2,7 @@ import tkinter
 import argparse
 import logging
 
-MINIMAX_GLOBINA = 4
+ALFABETA_GLOBINA = 3
 
 
 from logika import *
@@ -43,22 +43,22 @@ class Gui():
 
 
         # Podmenu za izbiro igre
-        menu_igra = tkinter.Menu(menu)
+        menu_igra = tkinter.Menu(menu, tearoff=0)
         menu.add_cascade(label="Igra", menu=menu_igra)
         menu_igra.add_command(label="Nova igra",
                               command=lambda: self.zacni_igro(Clovek(self),
-                                                              Racunalnik(self, Minimax(globina))))
+                                                              Racunalnik(self, Alfabeta(globina))))
         menu_igra.add_command(label="črni=Človek, beli=Človek",
                               command=lambda: self.zacni_igro(Clovek(self),
                                                               Clovek(self)))
         menu_igra.add_command(label="črni=Človek, beli=Računalnik",
                               command=lambda: self.zacni_igro(Clovek(self),
-                                                              Racunalnik(self, Minimax(globina))))
+                                                              Racunalnik(self, Alfabeta(globina))))
         menu_igra.add_command(label="črni=Računalnik, beli=Računalnik",
-                              command=lambda: self.zacni_igro(Racunalnik(self, Minimax(globina)),
-                                                              Racunalnik(self, Minimax(globina))))
+                              command=lambda: self.zacni_igro(Racunalnik(self, Alfabeta(globina)),
+                                                              Racunalnik(self, Alfabeta(globina))))
 
-        menu_pomoc = tkinter.Menu(menu)
+        menu_pomoc = tkinter.Menu(menu, tearoff=0)
         menu.add_cascade(label="Pomoč", menu=menu_pomoc)
         menu_pomoc.add_command(label="Navodila",
                               command=lambda: self.navodila())
@@ -90,7 +90,7 @@ class Gui():
 
 
         # Prični igro v načinu človek proti računalniku
-        self.zacni_igro(Clovek(self), Racunalnik(self, Minimax(globina)))
+        self.zacni_igro(Clovek(self), Racunalnik(self, Alfabeta(globina)))
 
     def navodila(self):
         self.napis.delete("all")
@@ -303,9 +303,9 @@ if __name__ == "__main__":
 
     # Opišemo argumente, ki jih sprejmemo iz ukazne vrstice
     parser = argparse.ArgumentParser(description="Igrica Reversi.")
-    # Argument --globina n, s privzeto vrednostjo MINIMAX_GLOBINA
+    # Argument --globina n, s privzeto vrednostjo ALFABETA_GLOBINA
     parser.add_argument('--globina',
-                        default=MINIMAX_GLOBINA,
+                        default=ALFABETA_GLOBINA,
                         type=int,
                         help='globina iskanja za minimax algoritem')
     # Argument --debug, ki vklopi sporočila o tem, kaj se dogaja
