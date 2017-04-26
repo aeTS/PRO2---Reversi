@@ -23,7 +23,7 @@ class Logika():
         self.plosca[3][4] = IGRALEC_C
         self.plosca[4][3] = IGRALEC_C
         self.plosca[4][4] = IGRALEC_B
-        
+
 
     def shrani_pozicijo(self):
         """Shrani trenutno pozicijo, da se bomo lahko kasneje vrnili vanjo
@@ -43,7 +43,7 @@ class Logika():
         (self.plosca, self.na_potezi) = self.zgodovina.pop()
 
 
-    
+
     def mozne_poteze(self):
         poteze = {}
         igralec = self.na_potezi
@@ -58,10 +58,10 @@ class Logika():
                     for elem in plosca[i][j+1:8]:
                         j1 += 1
                         if elem == igralec:
-                            
+
                             break
                         elif elem == PRAZNO and j1 == j+1:
-                            
+
                             break
                         elif elem == PRAZNO:
                             if (i, j1) not in poteze:
@@ -70,17 +70,17 @@ class Logika():
                                 poteze[(i, j1)].append((i, j))
                             break
                     j1 = j
-                           
-                        
-                
+
+
+
                     #LEVO
                     for elem in plosca[i][0:j][::-1]:
                         j1 -= 1
                         if elem == igralec:
-                            
+
                             break
                         elif elem == PRAZNO and j1 == j-1:
-                        
+
                             break
                         elif elem == PRAZNO:
                             if (i, j1) not in poteze:
@@ -89,15 +89,15 @@ class Logika():
                                 poteze[(i, j1)].append((i, j))
                             break
                     j1 = j
-                            
+
                     #DOL
                     for elem in plosca[i+1:8]:
                         i1 += 1
                         if elem[j] == igralec:
-                            
+
                             break
                         elif elem[j] == PRAZNO and i1 == i+1:
-                            
+
                             break
                         elif elem[j] == PRAZNO:
                             if (i1, j) not in poteze:
@@ -106,16 +106,16 @@ class Logika():
                                 poteze[(i1, j)].append((i, j))
                             break
                     i1 = i
-                            
-                        
+
+
                     #GOR
                     for elem in plosca[0:i][::-1]:
                         i1 -= 1
                         if elem[j] == igralec:
-                            
+
                             break
                         elif elem[j] == PRAZNO and i1 == i-1:
-                            
+
                             break
                         elif elem[j] == PRAZNO:
                             if (i1, j) not in poteze:
@@ -124,17 +124,17 @@ class Logika():
                                 poteze[(i1, j)].append((i, j))
                             break
                     i1 = i
-                           
+
                     #DIAGONALNO DESNO GOR
                     for k in range(j+1,8):
-                        
+
                         i1 += 1
                         if i1 < 8:
                             if plosca[i1][k] == igralec:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO and i1 == i+1:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO:
                                 if (i1, k) not in poteze:
@@ -143,18 +143,18 @@ class Logika():
                                     poteze[(i1, k)].append((i, j))
                                 break
                     i1 = i
-                                
-                            
+
+
                     #DIAGONALNO DESNO DOL
                     for k in range(j+1,8):
                         i1 -= 1
-                        
+
                         if i1 >= 0:
                             if plosca[i1][k] == igralec:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO and i1 == i-1:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO:
                                 if (i1, k) not in poteze:
@@ -162,19 +162,19 @@ class Logika():
                                 else:
                                     poteze[(i1, k)].append((i, j))
                                 break
-                            
+
                     i1 = i
-                                
+
                     #DIAGONALNO LEVO GOR
                     for k in range(j - 1, -1, -1):
-                        
+
                         i1 -= 1
                         if i1 >= 0:
                             if plosca[i1][k] == igralec:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO and i1 == i-1:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO:
                                 if (i1, k) not in poteze:
@@ -183,18 +183,18 @@ class Logika():
                                     poteze[(i1, k)].append((i, j))
                                 break
                     i1 = i
-                               
-                            
+
+
                     #DIAGONALNO LEVO DOL
                     for k in range(j - 1, -1, -1):
-                        
+
                         i1 += 1
                         if i1 < 8:
                             if plosca[i1][k] == igralec:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO and i1 == i+1:
-                                
+
                                 break
                             elif plosca[i1][k] == PRAZNO:
                                 if (i1, k) not in poteze:
@@ -203,20 +203,22 @@ class Logika():
                                     poteze[(i1, k)].append((i, j))
                                 break
                     i1 = i
-                                
-                    
+
+
 
         return poteze
-                    
-        
-        
-        
+
+
+
+
     def povleci_potezo(self, p):
         """Povleci potezo p, ne naredi nič, če je neveljavna.
         Vrne stanje_igre() po potezi ali None, ce je poteza neveljavna."""
         (i,j) = p
         mozne_poteze = self.mozne_poteze()
-        if p in mozne_poteze:
+        if p not in mozne_poteze:
+            return None # poteza ni veljvavna
+        else:
             self.shrani_pozicijo()
             self.plosca[i][j] = self.na_potezi
             for (i1, j1) in mozne_poteze[p]:
@@ -255,15 +257,18 @@ class Logika():
                         st += 1
                         self.plosca[k][st] = self.na_potezi
                     st = j1
-            
-            
+
+
+            self.na_potezi = nasprotnik(self.na_potezi)
             (stanje, crni, beli) = self.stanje_igre()
             if stanje == NI_KONEC:
-                self.na_potezi = nasprotnik(self.na_potezi)
+                pass
             elif stanje == KONEC:
                 self.na_potezi = None
+            else:
+                assert False, "nedefinirano stanje igre"
             return (stanje, crni, beli)
-            
+
 
 
 
@@ -278,80 +283,7 @@ class Logika():
                     beli += 1
                 elif plosca[i][j] == IGRALEC_C:
                     crni += 1
-        if self.mozne_poteze() == {}:
+        if len(self.mozne_poteze()) == 0:
             return (KONEC, crni, beli)
         else:
             return (NI_KONEC, crni, beli)
-        
-            
-
-
-
-        
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
