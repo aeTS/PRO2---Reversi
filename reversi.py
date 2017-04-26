@@ -1,5 +1,5 @@
 import tkinter
-import argparse  
+import argparse
 import logging
 
 MINIMAX_GLOBINA = 1
@@ -14,7 +14,7 @@ from racunalnik import *
 
 
 class Gui():
-    
+
     TAG_FIGURA = 'figura'
 
     # Oznaka za črte
@@ -25,11 +25,11 @@ class Gui():
 
     X_0=7
     Y_0=7
-    
-    
+
+
     def __init__(self, master, globina):
         # Objekti, ki predstavljajo belega, črnega igralca in igro
-        self.igralec_beli = None 
+        self.igralec_beli = None
         self.igralec_crni = None
         self.igra = None
         self.id_matrika = [8*[0] for _ in range(8)]
@@ -64,13 +64,13 @@ class Gui():
                               command=lambda: self.navodila())
 
 
-        
 
-        
+
+
         self.napis = tkinter.Canvas(master, width=8*Gui.VELIKOST_POLJA + 2*Gui.X_0,
                                      height=Gui.VELIKOST_POLJA+ 2*Gui.Y_0)
         self.napis.grid(row=0, column=0, columnspan=4)
-    
+
         # Napisi, ki prikazujejo stanje igre
         # Števca žetonov
         self.napis1 = tkinter.StringVar(master, value='ČRNI: 2')
@@ -83,7 +83,7 @@ class Gui():
                                      height=8*Gui.VELIKOST_POLJA+ 2*Gui.Y_0)
         self.plosca.grid(row=2, column=0, columnspan=4)
 
-        
+
 
         # Naročimo se na dogodek Button-1 na self.plosca,
         self.plosca.bind("<Button-1>", self.plosca_klik)
@@ -114,8 +114,8 @@ class Gui():
                                 "Igralca tako nadaljujeta, dokler ne zapolnita vseh polj\n"
                                 "ali dokler še imata možnost izvesti nadaljnjo potezo.\n"
                                 "6. Zmaga tisti, ki ima na plošči več žetonov svoje barve.")
-        
-        
+
+
 
     def zacni_igro(self, igralec_crni, igralec_beli):
         """Nastavi stanje igre na zacetek igre.
@@ -127,13 +127,13 @@ class Gui():
         self.napis.delete("all")
         # Ustvarimo novo igro
         self.igra = Logika()
-        
+
         # Nastavimo igralce
         self.igralec_crni = igralec_crni
         self.igralec_beli = igralec_beli
-        
+
         self.narisi_zacetno_pozicijo()
-        
+
         self.napis1.set('ČRNI: 2')
         self.napis2.set('BELI: 2')
         # Črni igralec je prvi na potezi
@@ -141,10 +141,10 @@ class Gui():
                                font=("Verdana", 16, "bold"))
         self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
         self.igralec_crni.igraj()
-        
+
     def koncaj_igro(self, crni, beli):
         """Nastavi stanje igre na konec igre."""
-        
+
         if crni > beli:
             self.napis.delete("all")
             self.napis.create_text(200, 25, text = "Zmagal je: ",
@@ -162,8 +162,8 @@ class Gui():
             self.napis.create_text(200, 25, text = "Neodločeno...",
                                    font=("Verdana", 16, "bold"))
             pass
-            
-        
+
+
 
     def prekini_igralce(self):
         """Sporoči igralcem, da morajo nehati razmišljati."""
@@ -194,7 +194,7 @@ class Gui():
         self.narisi_belega((4,4))
         self.narisi_crnega((3,4))
         self.narisi_crnega((4,3))
-    
+
 
     def narisi_belega(self, p):
         """Nariši bel žeton v polje (i, j)."""
@@ -205,7 +205,7 @@ class Gui():
         zeton = self.plosca.create_oval(x+a, y+a, x+b, y+b,
                                         width=1, tag=Gui.TAG_FIGURA)
         self.id_matrika[p[0]][p[1]] = zeton
-        
+
     def narisi_crnega(self, p):
         """Nariši črn žeton v polje (i, j)."""
         x = p[1] * Gui.VELIKOST_POLJA + Gui.X_0
@@ -220,9 +220,9 @@ class Gui():
     def plosca_klik(self, event):
         """Odzovi se na klik na ploščo."""
         # Tistemu, ki je na potezi, povemo, da je uporabnik kliknil na ploščo.
-        st = (event.x - Gui.X_0)// Gui.VELIKOST_POLJA 
+        st = (event.x - Gui.X_0)// Gui.VELIKOST_POLJA
         vr = (event.y - Gui.Y_0) // Gui.VELIKOST_POLJA
-        
+
         if 0 <= vr <= 7 and 0 <= st <= 7:
             if self.igra.na_potezi == IGRALEC_C:
                 self.igralec_crni.klik((vr, st))
@@ -247,9 +247,9 @@ class Gui():
                 elif plosca[vr][st] == "C":
                     self.plosca.delete(self.id_matrika[vr][st])
                     self.narisi_crnega((vr, st))
-                
-    
-        
+
+
+
     def povleci_potezo(self, p):
         """Povleci potezo p, če je veljavna. Če ni veljavna, ne naredi nič."""
         igralec = self.igra.na_potezi
@@ -261,26 +261,26 @@ class Gui():
             (stanje, crni, beli) = s
             self.napis1.set('ČRNI: '+str(crni))
             self.napis2.set('BELI: '+str(beli))
-            
+
             if stanje == NI_KONEC:
                 if self.igra.na_potezi == IGRALEC_C:
                     self.napis.delete("all")
                     self.napis.create_text(200, 25, text = "Na potezi je: ",
                                font=("Verdana", 16, "bold"))
                     self.zeton = self.napis.create_oval(300, 15, 325, 40,fill='black')
-                    
+
                     self.igralec_crni.igraj()
                 elif self.igra.na_potezi == IGRALEC_B:
                     self.napis.delete("all")
                     self.napis.create_text(200, 25, text = "Na potezi je: ",
                                font=("Verdana", 16, "bold"))
                     self.zeton = self.napis.create_oval(300, 15, 325, 40)
-                    
+
                     self.igralec_beli.igraj()
             elif stanje == KONEC:
                 self.koncaj_igro(crni, beli)
-            
-        
+
+
 
 
 
@@ -293,8 +293,8 @@ class Gui():
 
 
 
-            
-        
+
+
 if __name__ == "__main__":
     # Iz ukazne vrstice poberemo globino za minimax, uporabimo
     # modul argparse, glej https://docs.python.org/3.4/library/argparse.html
@@ -330,29 +330,3 @@ if __name__ == "__main__":
     # Kontrolo prepustimo glavnemu oknu. Funkcija mainloop neha
     # delovati, ko okno zapremo.
     root.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-        
-
-
-
-
-
-        
-
-
-        
