@@ -115,18 +115,10 @@ class Minimax:
                     for p in self.igra.mozne_poteze():
                         self.igra.povleci_potezo(p)
                         vrednost = self.minimax(globina-1, not maksimiziramo, alfa, beta)[1]
-                        vrednost_najboljse = max(vrednost_najboljse,
-                                                 self.minimax(globina-1, not maksimiziramo, alfa, beta)[1])
-
-
-
-                        alfa = max(alfa, vrednost_najboljse)
                         self.igra.razveljavi()
-                        if alfa > vrednost:
-                            continue
                         if vrednost >= vrednost_najboljse:
                             sez_najboljsih_potez.append(p)
-
+                        alfa = max(alfa, vrednost_najboljse)
                         if beta <= alfa:
                             break
                     najboljsa_poteza = random.choice(sez_najboljsih_potez)
@@ -140,15 +132,10 @@ class Minimax:
                     for p in self.igra.mozne_poteze():
                         self.igra.povleci_potezo(p)
                         vrednost = self.minimax(globina-1, not maksimiziramo, alfa, beta)[1]
-                        vrednost_najboljse = min(vrednost_najboljse,
-                                                 self.minimax(globina-1, not maksimiziramo, alfa, beta)[1])
-
-                        beta = max(beta, vrednost_najboljse)
                         self.igra.razveljavi()
-                        if beta < vrednost:
-                            continue
                         if vrednost <= vrednost_najboljse:
                             sez_najboljsih_potez.append(p)
+                        beta = min(beta, vrednost_najboljse)
                         if beta <= alfa:
                             break
                     najboljsa_poteza = random.choice(sez_najboljsih_potez)
