@@ -1,3 +1,5 @@
+######################################################################
+## Logika igre
 IGRALEC_B = "B"
 IGRALEC_C = "C"
 PRAZNO = "."
@@ -6,7 +8,7 @@ NI_KONEC = "ni konec"
 
 
 def nasprotnik(igralec):
-    """Vrni nasprotnika od igralca."""
+    """Vrne nasprotnika od igralca."""
     if igralec == IGRALEC_B:
         return IGRALEC_C
     elif igralec == IGRALEC_C:
@@ -32,19 +34,21 @@ class Logika():
         self.zgodovina.append((p, self.na_potezi))
 
     def kopija(self):
-        """Vrni kopijo te igre, brez zgodovine."""
+        """Vrne kopijo te igre, brez zgodovine."""
         k = Logika()
         k.plosca = [self.plosca[i][:] for i in range(8)]
         k.na_potezi = self.na_potezi
         return k
 
     def razveljavi(self):
-        """Razveljavi potezo in se vrni v prejšnje stanje."""
+        """Razveljavi potezo in se vrne v prejšnje stanje."""
         (self.plosca, self.na_potezi) = self.zgodovina.pop()
 
 
 
     def mozne_poteze(self):
+        """Vrne slovar, ki ima za ključe možne poteze,
+        vrednosti pa so polja, s katerih lahko do njih pridemo."""
         poteze = {}
         igralec = self.na_potezi
         plosca = self.plosca
@@ -212,7 +216,7 @@ class Logika():
 
 
     def povleci_potezo(self, p):
-        """Povleci potezo p, ne naredi nič, če je neveljavna.
+        """Povleče potezo p, ne naredi nič, če je neveljavna.
         Vrne stanje_igre() po potezi ali None, ce je poteza neveljavna."""
         (i,j) = p
         mozne_poteze = self.mozne_poteze()
@@ -271,8 +275,10 @@ class Logika():
 
 
 
-
     def stanje_igre(self):
+        """Ugotovi, kakšno je trenutno stanje igre.
+        Vrne trojko (KONEC/NI_KONEC, črni, beli), kjer črni/beli
+        pomenita št. žetonov posameznega igralca."""
         beli = 0
         crni = 0
         plosca = self.plosca

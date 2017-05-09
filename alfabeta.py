@@ -6,10 +6,10 @@ import random
 
 
 ######################################################################
-## Algoritem minimax
+## Algoritem alfa-beta rez
 
 class Alfabeta:
-    # Algoritem alfa-beta-rez predstavimo z objektom, ki hrani stanje igre in
+    # Algoritem alfa-beta rez predstavimo z objektom, ki hrani stanje igre in
     # algoritma, nima pa dostopa do GUI (ker ga ne sme uporabljati, saj deluje
     # v drugem vlaknu kot tkinter).
 
@@ -26,13 +26,13 @@ class Alfabeta:
         self.prekinitev = True
 
     def izracunaj_potezo(self, igra):
-        """Izračunaj potezo za trenutno stanje dane igre."""
+        """Izračuna potezo za trenutno stanje dane igre."""
         # To metodo pokličemo iz vzporednega vlakna
         self.igra = igra
         self.prekinitev = False # Glavno vlakno bo to nastvilo na True, če moramo nehati
         self.jaz = self.igra.na_potezi
         self.poteza = None # Sem napišemo potezo, ko jo najdemo
-        # Poženemo minimax
+        # Poženemo alfa-beta
         (poteza, vrednost) = self.alfabeta(self.globina, True, -Alfabeta.NESKONCNO, Alfabeta.NESKONCNO)
         self.jaz = None
         self.igra = None
@@ -44,11 +44,16 @@ class Alfabeta:
     # Vrednosti igre
     ZMAGA = 1000000000
     NESKONCNO = ZMAGA + 1 # Več kot zmaga
-    VREDNOST_PERMANENTNEGA = 100000
+    # Vrednost žetona, ki se mu barva ne bo več spremenila
+    VREDNOST_PERMANENTNEGA = 100000 
     VREDNOST_MOZNE_POTEZE = 100
 
     def vrednost_pozicije(self):
-        """Ocena vrednosti pozicije: sešteje vrednosti vseh trojk na plošči."""
+        """Ocena vrednosti pozicije:
+        1. prešteje, koliko je možnih potez
+        oz. iz koliko polj lahko do njih pridemo,
+        2. prešteje koliko kotov in zaporednih žetonov na robu,
+        ki se držijo kotnega, imata igralec na potezi in njegov nasprotnik."""
         plosca = self.igra.plosca
         (stanje, crni, beli) = self.igra.stanje_igre()
         stevilo_moznih_potez = 0
@@ -77,7 +82,6 @@ class Alfabeta:
                         permanentni_jaz.add((k, 0))
                     elif zeton == nasprotnik(self.jaz):
                         permanentni_nasprotnik.add((k, 0))
-            
                         
         if plosca[0][7] != PRAZNO:
             zeton = plosca[0][7]
@@ -116,6 +120,7 @@ class Alfabeta:
                         permanentni_jaz.add((7, k))
                     elif zeton == nasprotnik(self.jaz):
                         permanentni_nasprotnik.add((7, k))
+                        
         if plosca[7][0] != PRAZNO:
             zeton = plosca[7][0]
             for k in range(0, 7):
@@ -141,10 +146,10 @@ class Alfabeta:
 
 
     def alfabeta(self, globina, maksimiziramo, alfa, beta):
-        """Glavna metoda minimax."""
+        """Glavna metoda alfa-beta rez."""
         if self.prekinitev:
             # Sporočili so nam, da moramo prekiniti
-            logging.debug ("Minimax prekinja, globina = {0}".format(globina))
+            logging.debug ("Alfa-beta prekinja, globina = {0}".format(globina))
             return (None, 0)
         (stanje, crni, beli) = self.igra.stanje_igre()
         if stanje == KONEC:
@@ -166,7 +171,7 @@ class Alfabeta:
                 return (None, self.vrednost_pozicije())
             else:
 
-                # Naredimo eno stopnjo minimax
+                # Naredimo eno stopnjo alfa-beta
                 if maksimiziramo:
                     sez_najboljsih_potez = []
                     # Maksimiziramo
@@ -208,7 +213,7 @@ class Alfabeta:
                             break
                     najboljsa_poteza = random.choice(sez_najboljsih_potez)
 
-                assert (najboljsa_poteza is not None), "Alfabeta: izračunana poteza je None"
+                assert (najboljsa_poteza is not None), "Alfa-beta: izračunana poteza je None"
                 return (najboljsa_poteza, vrednost_najboljse)
         else:
-            assert False, "Alfabeta: nedefinirano stanje igre"
+            assert False, "Alfa-beta: nedefinirano stanje igre"
